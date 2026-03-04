@@ -10,77 +10,85 @@ O **GoHash-Auditor** é uma ferramenta de auditoria de segurança de alto desemp
 ## 📍 Índice
 
 1. [Sobre o Projeto](#-gohash-auditor)
-2. [Tecnologias Utilizadas](#-tecnologias-utilizadas)
-3. [Funcionalidades Principais](#-funcionalidades-principais)
+2. [Funcionalidades](#-funcionalidades)
+3. [Tecnologias Utilizadas](#-tecnologias-utilizadas)
 4. [Pré-requisitos](#-pré-requisitos)
-5. [Instalação](#-instalação)
+5. [Instalação e Configuração](#-instalação-e-configuração)
 6. [Como Utilizar](#-como-utilizar)
-7. [Configuração](#-configuração)
+7. [Estrutura de Pastas](#-estrutura-de-pastas)
 8. [Licença](#-licença)
 
 ---
 
-## 🚀 Funcionalidades Principais
+## 🚀 Funcionalidades
 
-* **Alta Performance:** Processamento eficiente de arquivos CSV para auditoria em escala.
-* **Inteligência de Ameaças:** Comparação automatizada contra uma base de assinaturas de malwares.
-* **Relatórios Profissionais:** Geração de documentos PDF contendo gráficos de pizza (Pie Chart) vetoriais nativos.
-* **Zero Dependências de Imagem:** O gráfico é desenhado diretamente no PDF via código, resultando em arquivos menores e mais nítidos.
-* **Arquitetura Moderna:** Construído sobre o UniPDF, garantindo suporte e atualizações de segurança.
+* **Análise Automatizada:** Identificação instantânea de malwares (Trojans, Adwares, Spywares) via blacklist.
+* **Organização Inteligente:** Leitura de dados e exportação de resultados centralizada na pasta `data`.
+* **Relatórios Temporais:** Geração de PDFs com carimbo de data e hora no nome do arquivo (ex: `Relatorio_04-03-2026_08-15.pdf`).
+* **Performance:** Processamento ultra-rápido utilizando as capacidades nativas de concorrência do Go.
 
----
+## 🛠️ Tecnologias Utilizadas
 
-## 🛠️ Pré-requisitos
+* **Linguagem:** [Go (Golang)](https://go.dev/)
+* **PDF Engine:** [UniPDF v3](https://github.com/unidoc/unipdf) - Geração de documentos profissionais.
+* **Data Format:** CSV para entrada de grandes conjuntos de dados.
 
-* **Go 1.25+**
-* **Chave UniPDF:** Este projeto utiliza a biblioteca `UniPDF`. Para remover a marca d'água de estudante, obtenha uma chave gratuita (Community) em [unidoc.io](https://cloud.unidoc.io/).
+## 📋 Pré-requisitos
 
----
+* **Go 1.25** ou superior instalado.
+* **Chave de Licença UniDoc:** Necessária para o funcionamento da biblioteca UniPDF (obtenha uma conta gratuita em [unidoc.io](https://cloud.unidoc.io)).
 
-## 📦 Instalação
+## 📦 Instalação e Configuração
 
-### 1. Clone o repositório
+Para configurar o ambiente e garantir que todas as dependências estejam na versão correta, execute:
+
 ```bash
-git clone https://github.com/seu-usuario/gohash_auditor.git
+# 1. Clone o repositório
+git clone [https://github.com/seu-usuario/gohash_auditor.git](https://github.com/seu-usuario/gohash_auditor.git)
 cd gohash_auditor
-```
 
-### 2. Inicialize o módulo
-```bash
+# 2. Inicialize o módulo Go (caso não exista)
 go mod init gohash-auditor 
-```
 
-### 3. Instale as dependências específicas do UniPDF
-```bash
-go get github.com/unidoc/unipdf/v3/common/license
-go get github.com/unidoc/unipdf/v3/creator
-go get github.com/unidoc/unipdf/v3/model
-```
-
-### 4. Organize as dependências
-```bash
+# 3. Instale as dependências estáveis
+go get [github.com/unidoc/unipdf/v3@v3.60.0](https://github.com/unidoc/unipdf/v3@v3.60.0)
 go mod tidy
+
+# 4. Configure sua licença no código
+# Abra o arquivo main.go e insira sua chave na função init()
+# license.SetMeteredKey("SUA_CHAVE_AQUI")
 ```
 
-### 5. Compile o binário
+---
+
+🎮 Como Utilizar
+Prepare seus dados: Coloque o seu arquivo apks.csv dentro da pasta data/ (se a pasta não existir, o programa a criará).
+Formato do CSV: um hash MD5 por linha.
+
+Execute a ferramenta:
+
 ```bash
-go build -o gohash-auditor main.go
+go run main.go
+```
+
+Resultado: O relatório será salvo em data/Relatorio_DD-MM-YYYY_HH-mm.pdf.
+
+---
+
+## 📂 Estrutura de Pastas
+
+```plaintext
+gohash_auditor/
+├── data/               # Contém o input (apks.csv) e os relatórios gerados
+├── main.go             # Código-fonte principal com a lógica de auditoria
+├── go.mod              # Definição do módulo e dependências
+├── go.sum              # Checksums das dependências
+└── README.md           # Documentação do projeto
 ```
 
 ---
 
-## 📋 Como Utilizar
-
-1.  **Prepare seus dados:** Coloque seu arquivo `apks.csv` na raiz do projeto (formato: um hash MD5 por linha).
-2.  **Execute a ferramenta:**
-    ```bash
-    ./gohash-auditor
-    ```
-3.  **Resultado:** O arquivo `Relatorio_Final.pdf` será gerado instantaneamente.
-
----
-
-## ⚙️ Configuração
+## ⚙️ Configuração da Blacklist
 
 Para atualizar a base de malwares, edite o mapa `blacklist` no `main.go`:
 
