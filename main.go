@@ -16,8 +16,12 @@ import (
 )
 
 func init() {
-	// Sua chave de licença ativa
-	license.SetMeteredKey("f5b0c18d8a8ff3872cc0fc351941474509fbd1572ad0a87cd720bab0ca27b23f")
+	// Agora o código procura uma chave no sistema, em vez de ter o texto fixo
+	key := os.Getenv("UNIPDF_LICENSE_KEY")
+	if key == "" {
+		fmt.Println("⚠️ Aviso: Variável UNIPDF_LICENSE_KEY não configurada.")
+	}
+	license.SetMeteredKey(key)
 }
 
 func main() {
