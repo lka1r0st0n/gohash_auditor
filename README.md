@@ -9,14 +9,15 @@ O **GoHash-Auditor** é uma ferramenta de auditoria de segurança de alto desemp
 
 ## 📍 Índice
 
-1. [Sobre o Projeto](#-gohash-auditor)
-2. [Funcionalidades](#-funcionalidades)
-3. [Tecnologias Utilizadas](#-tecnologias-utilizadas)
-4. [Pré-requisitos](#-pré-requisitos)
-5. [Instalação e Configuração](#-instalação-e-configuração)
-6. [Como Utilizar](#-como-utilizar)
-7. [Estrutura de Pastas](#-estrutura-de-pastas)
-8. [Licença](#-licença)
+1. [🛡️ Sobre o GoHash-Auditor](#-gohash-auditor)
+2. [🚀 Funcionalidades Principais](#-funcionalidades)
+3. [🛠️ Tecnologias Utilizadas](#-tecnologias-utilizadas)
+4. [📋 Pré-requisitos](#-pré-requisitos)
+5. [📦 Instalação e Módulos](#-instalação-e-configuração)
+6. [🎮 Guia de Uso (Pasta Data)](#-como-utilizar)
+7. [📂 Estrutura do Repositório](#-estrutura-de-pastas)
+8. [⚙️ Configuração da Blacklist](#-configuração-da-blacklist)
+9. [⚖️ Licença](#-licença)
 
 ---
 
@@ -108,8 +109,7 @@ blacklist := map[string]string{
 
 ---
 
-## ⚖️ Licença
-
+⚖️ Licença
 Distribuído sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
 
 ---
