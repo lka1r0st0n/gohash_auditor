@@ -1,0 +1,11 @@
+# Segurança: Nunca enviar as chaves
+.env
+
+# Relatórios: Não enviar os PDFs gerados
+data/Relatorio_*.pdf
+Relatorio_Final.pdf
+
+# Executáveis e logs
+gohash-auditor
+*.exe
+go.sum

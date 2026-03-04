@@ -10,117 +10,153 @@ import (
 	"strings"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
 func init() {
-	// Agora o código procura uma chave no sistema, em vez de ter o texto fixo
+	godotenv.Load()
 	key := os.Getenv("UNIPDF_LICENSE_KEY")
-	if key == "" {
-		fmt.Println("⚠️ Aviso: Variável UNIPDF_LICENSE_KEY não configurada.")
-	}
 	license.SetMeteredKey(key)
 }
 
 func main() {
-	// 1. CONFIGURAÇÃO DE CAMINHOS
+	// --- 1. DEFINIÇÃO DE CAMINHOS ---
 	inputPath := filepath.Join("data", "apks.csv")
-	outputDir := "data"
+	outputDir := filepath.Join("data", "reports")
 
-	// Garante que a pasta data existe
 	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
-		os.Mkdir(outputDir, 0755)
+		os.MkdirAll(outputDir, 0755)
 	}
 
+	// --- 2. BASE DE CONHECIMENTO (BLACKLIST) ---
 	blacklist := map[string]string{
 		"dc5e71c0d9c13f0482858c9f48267154": "Trojan.Android.Agent",
 		"57338b2881eaac606733b95b1f920698": "Adware.AirPush.B",
 		"03dccc10cca691849ae982fadb13a1e0": "Spyware.Stealer.X",
 	}
 
-	// 2. LEITURA DOS DADOS (Agora puxando de data/apks.csv)
+	// --- 3. PROCESSAMENTO DOS DADOS (CSV) ---
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatalf("❌ Erro: O arquivo '%s' não foi encontrado na pasta data!", inputPath)
+		log.Fatalf("❌ Erro: Ficheiro '%s' não encontrado.", inputPath)
 	}
 	defer file.Close()
 
 	reader := csv.NewReader(file)
 	total, infectados := 0, 0
-	listaAmeacas := [][]string{}
+	malwaresEncontrados := [][]string{}
 
 	for {
 		record, err := reader.Read()
 		if err == io.EOF {
 			break
 		}
-		if err != nil {
+		if err != nil || len(record) == 0 {
 			continue
 		}
+
 		hash := strings.ToLower(strings.TrimSpace(record[0]))
 		total++
-
-		if nomeMalware, existe := blacklist[hash]; existe {
+		if nome, existe := blacklist[hash]; existe {
 			infectados++
-			listaAmeacas = append(listaAmeacas, []string{hash, nomeMalware})
+			malwaresEncontrados = append(malwaresEncontrados, []string{hash, nome})
 		}
 	}
 	limpos := total - infectados
 
-	// 3. CONSTRUÇÃO DO PDF
+	// --- 4. CONFIGURAÇÃO VISUAL DO PDF ---
 	c := creator.New()
 	c.SetPageSize(creator.PageSizeA4)
 	c.NewPage()
 
 	fontBold, _ := model.NewStandard14Font(model.HelveticaBoldName)
+	fontRegular, _ := model.NewStandard14Font(model.HelveticaName)
 
-	title := c.NewParagraph("GoHash-Auditor: Relatório de Segurança")
-	title.SetFont(fontBold)
-	title.SetFontSize(20)
-	title.SetColor(creator.ColorRGBFrom8bit(44, 62, 80))
-	title.SetMargins(0, 0, 20, 10)
-	c.Draw(title)
+	corPrimaria := creator.ColorRGBFrom8bit(44, 62, 80)
+	corSucesso := creator.ColorRGBFrom8bit(39, 174, 96)
+	corPerigo := creator.ColorRGBFrom8bit(192, 57, 43)
 
-	agora := time.Now()
-	ts := c.NewParagraph("Gerado em: " + agora.Format("02/01/2006 15:04:05"))
-	ts.SetFontSize(10)
-	c.Draw(ts)
+	headerBg := c.NewRectangle(0, 0, 595, 100)
+	headerBg.SetFillColor(corPrimaria)
+	c.Draw(headerBg)
 
-	// Tabela de Resumo
-	table := c.NewTable(2)
-	table.SetMargins(0, 0, 20, 20)
+	// Desenho do Título Atualizado
+	pTitle := c.NewParagraph("GOHASH-AUDITOR")
+	pTitle.SetFont(fontBold)
+	pTitle.SetFontSize(24)
+	pTitle.SetColor(creator.ColorWhite)
+	pTitle.SetMargins(40, 0, 45, 0) // Margem superior alterada para 45
+	c.Draw(pTitle)
 
-	drawCell := func(text string, isHeader bool) {
+	subtitle := c.NewParagraph("RELATÓRIO TÉCNICO DE INTEGRIDADE")
+	subtitle.SetFont(fontRegular)
+	subtitle.SetFontSize(12)
+	subtitle.SetColor(creator.ColorRGBFrom8bit(189, 195, 199))
+	subtitle.SetMargins(40, 0, 5, 0)
+	c.Draw(subtitle)
+
+	// --- 5. DASHBOARD DE INDICADORES (TABELA) ---
+	table := c.NewTable(3)
+	table.SetMargins(40, 40, 40, 0)
+
+	addLabel := func(txt string) {
 		cell := table.NewCell()
-		cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
-		if isHeader {
-			cell.SetBackgroundColor(creator.ColorRGBFrom8bit(236, 240, 241))
-		}
-		p := c.NewParagraph(text)
-		if isHeader {
-			p.SetFont(fontBold)
-		}
+		cell.SetBackgroundColor(creator.ColorRGBFrom8bit(236, 240, 241))
+		p := c.NewParagraph(txt)
+		p.SetFont(fontBold)
+		p.SetFontSize(10)
+		p.SetMargins(10, 10, 10, 10)
 		cell.SetContent(p)
 	}
 
-	drawCell("Total Analisado", true)
-	drawCell(fmt.Sprintf("%d", total), false)
-	drawCell("Ameaças", true)
-	drawCell(fmt.Sprintf("%d", infectados), false)
-	drawCell("Limpos", true)
-	drawCell(fmt.Sprintf("%d", limpos), false)
+	addLabel("TOTAL ANALISADO")
+	addLabel("AMEAÇAS IDENTIFICADAS")
+	addLabel("ARQUIVOS SEGUROS")
+
+	addValue := func(txt string, col creator.Color) {
+		cell := table.NewCell()
+		cell.SetBorder(creator.CellBorderSideBottom, creator.CellBorderStyleSingle, 2)
+		p := c.NewParagraph(txt)
+		p.SetFont(fontBold)
+		p.SetFontSize(22)
+		p.SetColor(col)
+		p.SetMargins(10, 10, 10, 10)
+		cell.SetContent(p)
+	}
+
+	addValue(fmt.Sprintf("%d", total), corPrimaria)
+	addValue(fmt.Sprintf("%d", infectados), corPerigo)
+	addValue(fmt.Sprintf("%d", limpos), corSucesso)
+
 	c.Draw(table)
 
-	// 4. SALVAMENTO (Nome com Data e Hora na pasta data)
-	fileName := fmt.Sprintf("Relatorio_%s.pdf", agora.Format("02-01-2006_15-04"))
+	if len(malwaresEncontrados) > 0 {
+		sectionTitle := c.NewParagraph("DETALHES TÉCNICOS DA BLACKLIST")
+		sectionTitle.SetFont(fontBold)
+		sectionTitle.SetFontSize(14)
+		sectionTitle.SetMargins(40, 0, 40, 10)
+		c.Draw(sectionTitle)
+
+		for _, m := range malwaresEncontrados {
+			p := c.NewParagraph(fmt.Sprintf("• %s  →  DETECTADO: %s", m[0], m[1]))
+			p.SetFont(fontRegular)
+			p.SetFontSize(9)
+			p.SetMargins(50, 0, 2, 0)
+			c.Draw(p)
+		}
+	}
+
+	// --- 6. FINALIZAÇÃO E EXPORTAÇÃO ---
+	agora := time.Now()
+	fileName := fmt.Sprintf("Relatorio_%s.pdf", agora.Format("02-01-2006_15-04-05"))
 	finalPath := filepath.Join(outputDir, fileName)
 
-	err = c.WriteToFile(finalPath)
-	if err != nil {
+	if err := c.WriteToFile(finalPath); err != nil {
 		log.Fatalf("❌ Erro ao salvar PDF: %v", err)
 	}
 
-	fmt.Printf("✨ Auditoria concluída!\n📥 Entrada: %s\n📄 Relatório: %s\n", inputPath, finalPath)
+	fmt.Printf("✅ Auditoria finalizada!\n📁 Local: %s\n", finalPath)
 }
