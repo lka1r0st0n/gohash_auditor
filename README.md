@@ -3,76 +3,81 @@
 >[!WARNING]
 > **STATUS DO PROJETO: FASE BETA** 🧪
 
-O **GoHash-Auditor** é uma ferramenta de auditoria de segurança de alto desempenho, escrita em Go, projetada para identificar rapidamente ameaças conhecidas em conjuntos de hashes MD5 de ficheiros APKs.
+O **GoHash-Auditor** é uma ferramenta de linha de comando (CLI) desenvolvida em Go para auditoria técnica de integridade de arquivos APK. O sistema processa grandes volumes de dados via CSV, confronta hashes contra uma blacklist de malwares e gera um **Relatório Executivo em PDF** com visual de Dashboard.
 
 ---
 
-## 📍 Índice
-
-1. [🛡️ Sobre o GoHash-Auditor](#-gohash-auditor)
-2. [🚀 Funcionalidades Principais](#-funcionalidades)
-3. [🛠️ Tecnologias Utilizadas](#-tecnologias-utilizadas)
-4. [📋 Pré-requisitos](#-pré-requisitos)
-5. [📦 Instalação e Módulos](#-instalação-e-configuração)
-6. [🎮 Guia de Uso (Pasta Data)](#-como-utilizar)
-7. [📂 Estrutura do Repositório](#-estrutura-de-pastas)
-8. [⚙️ Configuração da Blacklist](#-configuração-da-blacklist)
-9. [⚖️ Licença](#-licença)
+- [🛡️ Sobre o Projeto](#-gohash-auditor)
+- [🌟 Principais Funcionalidades](#-principais-funcionalidades)
+- [📊 Estrutura do Relatório](#-estrutura-do-relatório)
+- [🚀 Como Executar](#-como-executar)
+  - [Pré-requisitos](#pré-requisitos)
+  - [📦 Instalação e Configuração](#-instalação-e-configuração)
+- [🎮 Como Utilizar](#-como-utilizar)
+- [📂 Estrutura de Pastas](#-estrutura-de-pastas)
+- [⚙️ Configuração da Blacklist](#-configuração-da-blacklist)
+- [🛠️ Tecnologias Utilizadas](#-tecnologias-utilizadas)
+- [⚖️ Licença](#-licença)
 
 ---
 
-## 🚀 Funcionalidades
+## 🌟 Principais Funcionalidades
 
-* **Análise Automatizada:** Identificação instantânea de malwares (Trojans, Adwares, Spywares) via blacklist.
-* **Organização Inteligente:** Leitura de dados e exportação de resultados centralizada na pasta `data`.
-* **Relatórios Temporais:** Geração de PDFs com carimbo de data e hora no nome do arquivo (ex: `Relatorio_04-03-2026_08-15.pdf`).
-* **Performance:** Processamento ultra-rápido utilizando as capacidades nativas de concorrência do Go.
+- **Processamento de Alta Performance**: Leitura eficiente de arquivos CSV contendo hashes de aplicações.
+- **Detecção de Ameaças**: Confronto automático com base de dados de malwares conhecidos (Trojan, Adware, Spyware).
+- **Relatórios Dinâmicos**: Geração de PDFs profissionais com timestamp no nome do arquivo (ex: `relatorio_dashboard_04-03-2026_09-24-07.pdf`).
+- **Interface Visual de Dashboard**: Relatórios com cabeçalho institucional azul marinho, cards de indicadores coloridos e lista detalhada de ameaças.
 
-## 🛠️ Tecnologias Utilizadas
+---
 
-* **Linguagem:** [Go (Golang)](https://go.dev/)
-* **PDF Engine:** [UniPDF v3](https://github.com/unidoc/unipdf) - Geração de documentos profissionais.
-* **Data Format:** CSV para entrada de grandes conjuntos de dados.
+## 📊 Estrutura do Relatório
 
-## 📋 Pré-requisitos
+O relatório gerado é dividido em seções lógicas para facilitar a tomada de decisão:
+1. **Cabeçalho Executivo**: Identificação clara do software de auditoria com título centralizado.
+2. **Cards de Estatísticas**: 
+   - **Ameaças**: Destacadas em vermelho para atenção imediata (Ex: 3 ameaças encontradas).
+   - **Arquivos Seguros**: Destacados em verde, confirmando a integridade (Ex: 1212 seguros).
+   - **Total Analisado**: Panorama geral do volume de dados processados (Ex: 1215 total).
+   - **Data da Análise**: Registro temporal da execução da auditoria.
+3. **Detalhamento Técnico**: Lista completa de hashes comprometidos, tipos de infecção e status da ameaça.
 
-* **Go 1.25** ou superior instalado.
-* **Chave de Licença UniDoc:** Necessária para o funcionamento da biblioteca UniPDF (obtenha uma conta gratuita em [unidoc.io](https://cloud.unidoc.io)).
+---
+
+## 🚀 Como Executar
+
+### Pré-requisitos
+- Go 1.16+
+- Chave de licença UniPDF (configurada no arquivo `.env` ou via `license.SetMeteredKey`)
+
+---
 
 ## 📦 Instalação e Configuração
 
-Para configurar o ambiente e garantir que todas as dependências estejam na versão correta, execute:
+Para configurar o ambiente e garantir que todas as dependências estejam na versão correta (v3.60.0), execute:
 
 ```bash
 # 1. Clone o repositório
-git clone [https://github.com/seu-usuario/gohash_auditor.git](https://github.com/seu-usuario/gohash_auditor.git)
+git clone [https://github.com/lka1r0st0n/gohash_auditor.git](https://github.com/lka1r0st0n/gohash_auditor.git)
 cd gohash_auditor
 
-# 2. Inicialize o módulo Go (caso não exista)
-go mod init gohash-auditor 
-
-# 3. Instale as dependências estáveis
+# 2. Instale as dependências estáveis (Compatíveis com o layout atual)
 go get [github.com/unidoc/unipdf/v3@v3.60.0](https://github.com/unidoc/unipdf/v3@v3.60.0)
 go mod tidy
-
-# 4. Configure sua licença no código
-# Abra o arquivo main.go e insira sua chave na função init()
-# license.SetMeteredKey("SUA_CHAVE_AQUI")
 ```
 
 ---
 
-🎮 Como Utilizar
-Prepare seus dados: Coloque o seu arquivo apks.csv dentro da pasta data/ (se a pasta não existir, o programa a criará).
-Formato do CSV: um hash MD5 por linha.
+## 🎮 Como Utilizar
+
+Prepare seus dados: Coloque o seu arquivo apks.csv dentro da pasta data/. O formato deve ser um hash MD5 por linha.
 
 Execute a ferramenta:
 
-```bash
+```Bash
 go run main.go
 ```
 
-Resultado: O relatório será salvo em data/Relatorio_DD-MM-YYYY_HH-mm.pdf.
+Resultado: O relatório será salvo automaticamente em ```data/reports/relatorio_dashboard_DD-MM-YYYY_HH-MM-SS.pdf```.
 
 ---
 
@@ -80,20 +85,25 @@ Resultado: O relatório será salvo em data/Relatorio_DD-MM-YYYY_HH-mm.pdf.
 
 ```plaintext
 gohash_auditor/
-├── data/               # Contém o input (apks.csv) e os relatórios gerados
-├── main.go             # Código-fonte principal com a lógica de auditoria
-├── go.mod              # Definição do módulo e dependências
-├── go.sum              # Checksums das dependências
-└── README.md           # Documentação do projeto
+├── data/
+│   ├── apks.csv          # Arquivo de entrada com os hashes
+│   └── reports/          # Pasta de saída dos relatórios PDF dinâmicos
+├── main.go               # Código-fonte com lógica de Dashboard e Auditoria
+├── .env                  # Variáveis de ambiente (Chave de Licença)
+├── go.mod                # Módulo Go (travado na UniPDF v3.60.0)
+└── README.md             # Documentação do projeto
 ```
 
 ---
 
 ## ⚙️ Configuração da Blacklist
+Para atualizar a base de malwares, edite o mapa blacklist dentro do main.go. Atualmente, o sistema identifica ameaças como:
 
-Para atualizar a base de malwares, edite o mapa `blacklist` no `main.go`:
+- Trojan.Android.Agent
+- Adware.AirPush.B
+- Spyware.Stealer.X
 
-```go
+```Go
 blacklist := map[string]string{
     "hash_md5_aqui": "Nome_da_Ameaça",
 }
@@ -102,18 +112,20 @@ blacklist := map[string]string{
 ---
 
 ## 🛠️ Tecnologias Utilizadas
+UniPDF (v3.60.0): Engine profissional para criação de documentos e gráficos vetoriais.
 
-- UniPDF: Engine profissional para criação de documentos e gráficos vetoriais.
+Go Standard Library: encoding/csv, os, io, time.
 
--  Go Standard Library: encoding/csv, os, io.
-
----
-
-⚖️ Licença
-Distribuído sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+Godotenv: Para carregamento seguro de chaves de API.
 
 ---
 
-*Desenvolvido por [lka1r0st0n](https://github.com/lka1r0st0n) para fins de estudo em Segurança da Informação.*
+## ⚖️ Licença
+
+Distribuído sob a licença MIT.
+
+---
+
+Desenvolvido por [lka1r0st0n](https://github.com/lka1r0st0n) para fins de estudo em Segurança da Informação.
 
 ---
