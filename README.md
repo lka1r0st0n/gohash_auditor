@@ -108,7 +108,8 @@ blacklist := map[string]string{
 
 ---
 
-⚖️ Licença
+## ⚖️ Licença
+
 Distribuído sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
 
 ---
